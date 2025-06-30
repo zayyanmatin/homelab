@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: applications
+  namespace: argocd
+spec:
+  generators:
+    - git:
+        repoURL: https://github.com/NBCUDTC/sle-console-devops-aws-mgnmt
+        revision: HEAD
+        files:
+          - path: deployment/*/{{ $.Values.env }}/values.yaml
+  template:
+    metadata:
+      name: {{ `"{{ path[1] }}"` }}
+    spec:
+      project: "default"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: {{ `"{{ path[1] }}"` }} 
+      source:
+        repoURL: https://github.com/NBCUDTC/sle-console-devops-aws-mgnmt
+        targetRevision: "HEAD"
+        path: {{ `"{{ path }}"` }}
+        helm:
+          ignoreMissingValueFiles: true
+          valueFiles:
+            - values.yaml
+
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+
+        syncOptions:
+          - CreateNamespace=false
