@@ -2,3 +2,4 @@ terraform.tfstate
 ssh/
 .env
 ghapp-ssh.pem
+.terraform
